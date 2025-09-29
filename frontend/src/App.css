@@ -1,44 +1,46 @@
-/* Smooth scrolling for the entire page */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Remove default margins and padding */
+/* Reset and base styles */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
 }
 
-::-webkit-scrollbar-track {
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   background: #000000;
+  color: #ffffff;
+  overflow-x: hidden;
 }
 
-::-webkit-scrollbar-thumb {
-  background: #374151;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #4b5563;
-}
-
-/* Ensure full height for the app */
+/* Root container */
 #root {
   min-height: 100vh;
   background: #000000;
+  position: relative;
 }
 
-/* App container */
-.App {
+/* Locomotive Scroll container */
+.locomotive-scroll-container {
   min-height: 100vh;
   width: 100%;
-  background: #000000;
+}
+
+.locomotive-scroll-container.scroll-loading {
+  opacity: 0;
+}
+
+.locomotive-scroll-container.scroll-ready {
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
 }
 
 /* Locomotive Scroll styles */
@@ -54,6 +56,7 @@ html {
   transform-origin: center right;
   transition: transform 0.3s, opacity 0.3s;
   opacity: 0;
+  z-index: 1000;
 }
 
 .c-scrollbar:hover {
@@ -68,13 +71,18 @@ html {
   position: absolute;
   top: 0;
   right: 0;
-  background-color: #374151;
-  opacity: 0.5;
+  background-color: #f97316;
+  opacity: 0.7;
   width: 7px;
   border-radius: 10px;
   margin: 2px;
   cursor: -webkit-grab;
   cursor: grab;
+  transition: opacity 0.3s ease;
+}
+
+.c-scrollbar_thumb:hover {
+  opacity: 1;
 }
 
 .c-scrollbar_thumb.c-scrollbar_thumb_active {
@@ -82,8 +90,86 @@ html {
   cursor: grabbing;
 }
 
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #000000;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #374151;
+  border-radius: 4px;
+  transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #f97316;
+}
+
 /* Navigation styles */
 nav {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  will-change: transform;
+}
+
+/* Layout spacing */
+main {
+  padding-top: 4rem; /* Account for fixed navigation */
+  min-height: calc(100vh - 4rem);
+}
+
+/* Z-index management */
+nav {
+  z-index: 50;
+}
+
+.c-scrollbar {
+  z-index: 1000;
+}
+
+/* Smooth transitions */
+* {
+  transition: color 0.2s ease, background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+/* Focus styles for accessibility */
+*:focus-visible {
+  outline: 2px solid #f97316;
+  outline-offset: 2px;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .c-scrollbar_thumb {
+    background-color: #ffffff;
+    opacity: 1;
+  }
+}
+
+/* Print styles */
+@media print {
+  nav,
+  .c-scrollbar,
+  footer {
+    display: none !important;
+  }
+
+  main {
+    padding-top: 0 !important;
+  }
 }

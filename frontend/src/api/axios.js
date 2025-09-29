@@ -4,6 +4,7 @@ import axios from "axios";
 const axiosInstance = axios.create({
   baseURL: "http://localhost:8000/api/v1",
   timeout: 10000, // 10 seconds timeout
+  withCredentials: true, // Enable cookies for authentication
   headers: {
     "Content-Type": "application/json",
   },
@@ -12,12 +13,8 @@ const axiosInstance = axios.create({
 // Request interceptor for adding auth tokens or other headers
 axiosInstance.interceptors.request.use(
   (config) => {
-    // Add auth token if available
-    const token = localStorage.getItem("authToken");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-
+    // Cookies are automatically included with withCredentials: true
+    // No need to manually add auth headers since we're using cookies
     return config;
   },
   (error) => {
@@ -44,8 +41,7 @@ axiosInstance.interceptors.response.use(
       // Handle specific status codes
       switch (error.response.status) {
         case 401:
-          // Unauthorized - redirect to login or clear auth
-          localStorage.removeItem("authToken");
+          // Unauthorized - redirect to login
           window.location.href = "/login";
           break;
         case 403:

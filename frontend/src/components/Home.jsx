@@ -4,7 +4,6 @@ import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { useState, useEffect } from "react";
 import ExploreBikes from "./ExploreBikes";
-import BikeCard from "./BikeCard";
 
 const Home = () => {
   const words = ["Book", "Ride", "Explore"];
@@ -18,14 +17,14 @@ const Home = () => {
   }, [words.length]);
 
   return (
-    <section className="relative min-h-screen bg-black">
+    <section className="relative min-h-screen bg-black overflow-hidden">
       {/* Dark background with subtle glow */}
       <div className="absolute inset-0 bg-black">
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl"></div>
       </div>
 
       <div className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col items-center gap-8 min-h-screen justify-center">
+        <div className="flex flex-col items-center gap-8 min-h-[90vh] justify-center">
           {/* Badge */}
           <motion.div
             data-scroll
@@ -158,13 +157,6 @@ const Home = () => {
               </Button>
             </a>
           </motion.div>
-        </div>
-      </div>
-
-      {/* Bike Cards Section */}
-      <div className="relative z-10 bg-white py-20">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <BikeCard />
         </div>
       </div>
 
