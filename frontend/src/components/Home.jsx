@@ -4,7 +4,7 @@ import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { useState, useEffect } from "react";
 import ExploreBikes from "./ExploreBikes";
-import BikeCard from "./BikeCard";
+// import BikeCard from "./BikeCard";
 
 const Home = () => {
   const words = ["Book", "Ride", "Explore"];
@@ -161,12 +161,12 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Bike Cards Section */}
+      {/* Bike Cards Section
       <div className="relative z-10 bg-white py-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <BikeCard />
         </div>
-      </div>
+      </div> */}
 
       <ExploreBikes />
 
@@ -297,7 +297,7 @@ const Home = () => {
             <Button
               size="lg"
               variant="outline"
-              className="border-gray-600 text-white hover:bg-gray-700 transition-all duration-300"
+              className="border-gray-600 text-black hover:bg-zinc-400 transition-all duration-300"
             >
               View Bikes
             </Button>
