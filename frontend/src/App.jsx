@@ -11,6 +11,8 @@ const LazySearch = lazy(() => import("./pages/Search.jsx"));
 const LazyLogin = lazy(() => import("./components/Login.jsx"));
 const LazySignup = lazy(() => import("./components/Signup.jsx"));
 const LazyProfile = lazy(() => import("./components/Profile.jsx"));
+const LazyBookings = lazy(() => import("./pages/Bookings.jsx"));
+const LazySearchdemo = lazy(() => import("./pages/Searchdemo.jsx"));
 
 function App() {
   return (
@@ -20,15 +22,20 @@ function App() {
           <Route index element={<LazyHome />} />
           <Route path="explore" element={<LazyExploreBikes />} />
           <Route path="search" element={<LazySearch />} />
+          <Route path="searchdemo" element={<LazySearchdemo />} />
           <Route path="bikes" element={<LazyExploreBikes />} />
           <Route
             path="bookings"
             element={
-              <div className="min-h-screen bg-black flex items-center justify-center">
-                <h1 className="text-white text-2xl">
-                  Bookings Page - Coming Soon
-                </h1>
-              </div>
+              <Suspense
+                fallback={
+                  <div className="min-h-screen bg-black flex items-center justify-center">
+                    <div className="text-white text-xl">Loading...</div>
+                  </div>
+                }
+              >
+                <LazyBookings />
+              </Suspense>
             }
           />
           <Route

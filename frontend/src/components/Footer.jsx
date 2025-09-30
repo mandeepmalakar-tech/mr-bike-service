@@ -35,7 +35,7 @@ const Footer = () => {
             <div className="flex space-x-4">
               <a
                 href="#"
-                className="text-gray-400 hover:text-orange-400 transition-colors duration-300"
+                className="text-gray-400 hover:text-blue-500 transition-colors duration-300"
               >
                 <svg
                   className="w-6 h-6"
@@ -59,7 +59,7 @@ const Footer = () => {
               </a>
               <a
                 href="#"
-                className="text-gray-400 hover:text-orange-400 transition-colors duration-300"
+                className="text-gray-400 hover:text-red-600 transition-colors duration-300"
               >
                 <svg
                   className="w-6 h-6"

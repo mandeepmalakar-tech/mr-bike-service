@@ -1,18 +1,10 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion"; // eslint-disable-line no-unused-vars
 import { useLocation, useNavigate } from "react-router-dom";
-import {
-  BikeIcon,
-  MapPinIcon,
-  ClockIcon,
-  CalendarIcon,
-  StarIcon,
-  FilterIcon,
-  SortAscIcon,
-  SearchIcon,
-} from "lucide-react";
+import { BikeIcon, CalendarIcon, SearchIcon } from "lucide-react";
 import { Button } from "../components/ui/button";
 import BikeCard from "../components/BikeCard";
+import BookingModal from "../components/BookingModal";
 import axiosInstance from "../api/axios";
 
 const Search = () => {
@@ -20,136 +12,66 @@ const Search = () => {
   const navigate = useNavigate();
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({
-    sort: "packageCost:asc",
-    minPrice: "",
-    maxPrice: "",
-  });
   const [searchParams, setSearchParams] = useState({});
+  const [error, setError] = useState(null);
+  const [selectedBike, setSelectedBike] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Mock data for development/fallback
-  const getMockBikes = () => [
-    {
-      _id: "1",
-      name: "Himalayan BS6",
-      packageCost: 1399,
-      location: "INA Metro",
-      city: "vizag",
-      numberOfVehicles: 3,
-      imageUrl:
-        "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=400&h=300&fit=crop",
-      isAvailable: true,
-    },
-    {
-      _id: "2",
-      name: "FZ S V3",
-      packageCost: 749,
-      location: "INA Metro",
-      city: "vizag",
-      numberOfVehicles: 1,
-      imageUrl:
-        "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=400&h=300&fit=crop",
-      isAvailable: true,
-    },
-    {
-      _id: "3",
-      name: "Avenger 220 Cruise",
-      packageCost: 749,
-      location: "INA Metro",
-      city: "vizag",
-      numberOfVehicles: 1,
-      imageUrl:
-        "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=400&h=300&fit=crop",
-      isAvailable: true,
-    },
-    {
-      _id: "4",
-      name: "Pulsar 150 Bs4",
-      packageCost: 699,
-      location: "INA Metro",
-      city: "vizag",
-      numberOfVehicles: 1,
-      imageUrl:
-        "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=400&h=300&fit=crop",
-      isAvailable: true,
-    },
-    {
-      _id: "5",
-      name: "Classic 350 Bs6",
-      packageCost: 1149,
-      location: "INA Metro",
-      city: "vizag",
-      numberOfVehicles: 2,
-      imageUrl:
-        "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=400&h=300&fit=crop",
-      isAvailable: true,
-    },
-    {
-      _id: "6",
-      name: "Scram 411",
-      packageCost: 1399,
-      location: "INA Metro",
-      city: "vizag",
-      numberOfVehicles: 1,
-      imageUrl:
-        "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=400&h=300&fit=crop",
-      isAvailable: true,
-    },
-  ];
+  const fetchBikes = useCallback(async (params) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const queryParams = {
+        city: params.city || "vizag",
+        available: "true",
+        sort: "packageCost:desc",
+      };
 
-  const fetchBikes = useCallback(
-    async (params) => {
-      setLoading(true);
-      try {
-        const queryParams = {
-          city: params.city || "vizag",
-          available: "true",
-          sort: filters.sort,
-          ...(filters.minPrice && { minPrice: filters.minPrice }),
-          ...(filters.maxPrice && { maxPrice: filters.maxPrice }),
-        };
+      console.log("Fetching bikes from backend with params:", queryParams);
 
-        // Use axios instance with pre-configured base URL
-        const response = await axiosInstance.get("/bikes", {
-          params: queryParams,
-        });
+      // Use axios instance with pre-configured base URL
+      const response = await axiosInstance.get("/bikes", {
+        params: queryParams,
+      });
 
-        if (response.data.success) {
-          setSearchResults(response.data.data.bikes);
-        } else {
-          console.error("API returned error:", response.data.message);
-          // Fallback to mock data for development
-          setSearchResults(getMockBikes());
-        }
-      } catch (error) {
-        console.error("Error fetching bikes:", error);
+      console.log("Backend response:", response.data);
 
-        // Handle different types of errors
-        if (error.code === "ECONNABORTED") {
-          console.error("Request timeout");
-        } else if (error.response) {
-          // Server responded with error status
-          console.error(
-            "Server error:",
-            error.response.status,
-            error.response.data
-          );
-        } else if (error.request) {
-          // Request was made but no response received
-          console.error("Network error:", error.request);
-        } else {
-          // Something else happened
-          console.error("Error:", error.message);
-        }
-
-        // Use mock data as fallback for development
-        setSearchResults(getMockBikes());
-      } finally {
-        setLoading(false);
+      if (response.data.success && response.data.data) {
+        const bikes = response.data.data.bikes || [];
+        setSearchResults(bikes);
+        console.log(`Successfully fetched ${bikes.length} bikes from database`);
+      } else {
+        console.error("API returned unexpected format:", response.data);
+        setError("Unable to fetch bikes. Please try again later.");
+        setSearchResults([]);
       }
-    },
-    [filters.sort, filters.minPrice, filters.maxPrice]
-  );
+    } catch (error) {
+      console.error("Error fetching bikes from backend:", error);
+
+      // Set user-friendly error message
+      let errorMessage = "Unable to connect to server. ";
+
+      if (error.code === "ECONNABORTED") {
+        errorMessage = "Request timeout. Please check your connection.";
+      } else if (error.response) {
+        // Server responded with error status
+        errorMessage = `Server error: ${error.response.status}. ${
+          error.response.data?.message || "Please try again later."
+        }`;
+      } else if (error.request) {
+        // Request was made but no response received
+        errorMessage =
+          "Cannot connect to backend server. Please make sure the backend is running on port 8000.";
+      } else {
+        errorMessage = error.message || "An unexpected error occurred.";
+      }
+
+      setError(errorMessage);
+      setSearchResults([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     // Get search parameters from URL or location state
@@ -160,20 +82,19 @@ const Search = () => {
     fetchBikes(params);
   }, [location.state, fetchBikes]);
 
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    setFilters((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const applyFilters = () => {
+  const handleSearch = () => {
     fetchBikes(searchParams);
   };
 
   const handleBookBike = (bookingData) => {
-    navigate("/booking", { state: bookingData });
+    // Store the bike and search params for booking
+    setSelectedBike(bookingData.bike);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedBike(null);
   };
 
   const handleViewBikeDetails = (bike) => {
@@ -191,123 +112,60 @@ const Search = () => {
   };
 
   return (
-    <section className="relative min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Search Header - Matching the reference image */}
-        <motion.div
-          className="bg-white rounded-2xl shadow-lg p-6 mb-8"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <div className="flex flex-col lg:flex-row gap-6 items-center">
-            {/* Pickup Date */}
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Pickup Date
-              </label>
-              <div className="flex items-center gap-3 p-3 border border-gray-300 rounded-lg bg-gray-50">
-                <CalendarIcon className="w-5 h-5 text-gray-500" />
-                <span className="text-gray-900 font-medium">
+    <div className="min-h-screen bg-gray-50">
+      {/* Search Header */}
+      <div className="bg-white border-b border-gray-200 py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
+            {/* Date Display */}
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <CalendarIcon className="w-4 h-4 text-gray-500" />
+                <span className="text-sm text-gray-700">
                   {searchParams.pickupDate
                     ? formatDate(searchParams.pickupDate)
-                    : "Select Date"}
-                  , {searchParams.pickupTime || "00:00"}
+                    : "01 Oct 25"}
+                  , {searchParams.pickupTime || "22:00"}
                 </span>
               </div>
-            </div>
 
-            {/* Return Date */}
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Return Date
-              </label>
-              <div className="flex items-center gap-3 p-3 border border-gray-300 rounded-lg bg-gray-50">
-                <CalendarIcon className="w-5 h-5 text-gray-500" />
-                <span className="text-gray-900 font-medium">
+              <div className="text-sm text-gray-500">
+                {searchParams.days
+                  ? `${searchParams.days}day, 20hrs`
+                  : "56day, 20hrs"}
+              </div>
+
+              <div className="flex items-center gap-2">
+                <CalendarIcon className="w-4 h-4 text-gray-500" />
+                <span className="text-sm text-gray-700">
                   {searchParams.returnDate
                     ? formatDate(searchParams.returnDate)
-                    : "Select Date"}
-                  , {searchParams.returnTime || "00:00"}
+                    : "27 Nov 25"}
+                  , {searchParams.returnTime || "18:00"}
                 </span>
-              </div>
-            </div>
-
-            {/* Duration Display */}
-            <div className="text-center">
-              <div className="text-sm text-gray-500 mb-1">Duration</div>
-              <div className="text-lg font-bold text-gray-900">
-                {searchParams.days
-                  ? `${searchParams.days}day, 23hrs`
-                  : "0day, 0hrs"}
               </div>
             </div>
 
             {/* Search Button */}
             <Button
-              onClick={applyFilters}
-              className="bg-blue-600 text-white hover:bg-blue-700 px-8 py-3 rounded-lg font-semibold transition-all duration-300"
+              onClick={handleSearch}
+              className="bg-blue-600 text-white hover:bg-blue-700 px-6 py-2 rounded-lg font-medium"
             >
-              <SearchIcon className="w-5 h-5 mr-2" />
+              <SearchIcon className="w-4 h-4 mr-2" />
               Search
             </Button>
           </div>
-        </motion.div>
+        </div>
+      </div>
 
-        {/* Filters */}
-        <motion.div
-          className="bg-white rounded-2xl shadow-lg p-6 mb-8"
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-        >
-          <div className="flex flex-col lg:flex-row gap-6 items-center">
-            <div className="flex items-center gap-2 text-gray-700 font-medium">
-              <FilterIcon className="w-5 h-5 text-blue-600" />
-              Filters
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-4 flex-1">
-              <select
-                name="sort"
-                value={filters.sort}
-                onChange={handleFilterChange}
-                className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:border-blue-500 transition-colors duration-300"
-              >
-                <option value="packageCost:asc">Price: Low to High</option>
-                <option value="packageCost:desc">Price: High to Low</option>
-                <option value="name:asc">Name: A to Z</option>
-                <option value="name:desc">Name: Z to A</option>
-              </select>
-
-              <input
-                type="number"
-                name="minPrice"
-                placeholder="Min Price"
-                value={filters.minPrice}
-                onChange={handleFilterChange}
-                className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors duration-300"
-              />
-
-              <input
-                type="number"
-                name="maxPrice"
-                placeholder="Max Price"
-                value={filters.maxPrice}
-                onChange={handleFilterChange}
-                className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors duration-300"
-              />
-            </div>
-
-            <Button
-              onClick={applyFilters}
-              className="bg-blue-600 text-white hover:bg-blue-700 transition-all duration-300"
-            >
-              <SearchIcon className="w-4 h-4 mr-2" />
-              Apply
-            </Button>
-          </div>
-        </motion.div>
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Results Header */}
+        <div className="mb-6">
+          <h2 className="text-lg text-gray-600">
+            Showing {searchResults.length} vehicles
+          </h2>
+        </div>
 
         {/* Results */}
         {loading ? (
@@ -318,24 +176,50 @@ const Search = () => {
             transition={{ duration: 0.6 }}
           >
             <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-gray-600">Searching for available bikes...</p>
+            <p className="text-gray-600">
+              Searching for available bikes from database...
+            </p>
+          </motion.div>
+        ) : error ? (
+          <motion.div
+            className="text-center py-16"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6 }}
+          >
+            <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto">
+              <BikeIcon className="w-16 h-16 text-red-400 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-red-900 mb-2">
+                Connection Error
+              </h3>
+              <p className="text-red-600 mb-6">{error}</p>
+              <div className="space-y-2 text-sm text-left text-gray-700 bg-white p-4 rounded border border-gray-200 mb-4">
+                <p className="font-semibold">Troubleshooting steps:</p>
+                <ol className="list-decimal list-inside space-y-1">
+                  <li>Make sure the backend server is running on port 8000</li>
+                  <li>Check if MongoDB is connected</li>
+                  <li>
+                    Verify the API endpoint: http://localhost:8000/api/v1/bikes
+                  </li>
+                  <li>Check browser console for detailed error logs</li>
+                </ol>
+              </div>
+              <Button
+                onClick={() => fetchBikes(searchParams)}
+                className="bg-blue-600 text-white hover:bg-blue-700 transition-all duration-300"
+              >
+                Try Again
+              </Button>
+            </div>
           </motion.div>
         ) : searchResults.length > 0 ? (
           <motion.div
-            initial={{ opacity: 0, y: 40 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <div className="mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                {searchResults.length} Bike{searchResults.length > 1 ? "s" : ""}{" "}
-                Found
-              </h2>
-              <p className="text-gray-600">Choose your perfect ride</p>
-            </div>
-
-            {/* Bike Grid - Matching reference image layout */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Bike Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
               {searchResults.map((bike) => (
                 <BikeCard
                   key={bike._id}
@@ -356,22 +240,30 @@ const Search = () => {
           >
             <BikeIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              No Bikes Found
+              No Bikes Available
             </h3>
             <p className="text-gray-600 mb-6">
-              Sorry, no bikes are available for the selected criteria. Try
-              adjusting your filters or dates.
+              No bikes are currently available in the database. Please check
+              back later or contact support.
             </p>
             <Button
-              onClick={() => navigate("/explore")}
+              onClick={() => navigate("/")}
               className="bg-blue-600 text-white hover:bg-blue-700 transition-all duration-300"
             >
-              Search Again
+              Go Home
             </Button>
           </motion.div>
         )}
       </div>
-    </section>
+
+      {/* Booking Modal */}
+      <BookingModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        bike={selectedBike}
+        searchParams={searchParams}
+      />
+    </div>
   );
 };
 

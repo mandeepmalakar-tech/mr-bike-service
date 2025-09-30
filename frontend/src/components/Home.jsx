@@ -3,7 +3,7 @@ import { ArrowRightIcon } from "lucide-react";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { useState, useEffect } from "react";
-import ExploreBikes from "./ExploreBikes";
+import ExploreBikesDemo from "./ExploreBikesDemo";
 
 const Home = () => {
   const words = ["Book", "Ride", "Explore"];
@@ -17,7 +17,7 @@ const Home = () => {
   }, [words.length]);
 
   return (
-    <section className="relative min-h-screen bg-black overflow-hidden">
+    <section className="relative min-h-screen bg-black">
       {/* Dark background with subtle glow */}
       <div className="absolute inset-0 bg-black">
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl"></div>
@@ -27,8 +27,6 @@ const Home = () => {
         <div className="flex flex-col items-center gap-8 min-h-[90vh] justify-center">
           {/* Badge */}
           <motion.div
-            data-scroll
-            data-scroll-speed="0.5"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
@@ -39,7 +37,7 @@ const Home = () => {
             >
               <span className="text-gray-300">Latest offers live now!</span>
               <a
-                href="#bikes"
+                href="/searchdemo"
                 className="flex items-center gap-1 ml-2 text-white hover:text-orange-400 transition-colors"
               >
                 Get started
@@ -64,8 +62,6 @@ const Home = () => {
 
           {/* Main Title */}
           <motion.h1
-            data-scroll
-            data-scroll-speed="0.3"
             className="text-3xl sm:text-6xl lg:text-7xl font-bold text-white leading-tight text-center max-w-5xl"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -105,8 +101,6 @@ const Home = () => {
 
           {/* Description */}
           <motion.p
-            data-scroll
-            data-scroll-speed="0.4"
             className="text-lg sm:text-xl text-gray-300 max-w-3xl text-center leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -118,8 +112,6 @@ const Home = () => {
 
           {/* CTA Buttons */}
           <motion.div
-            data-scroll
-            data-scroll-speed="0.6"
             className="flex flex-col sm:flex-row gap-4"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -129,7 +121,7 @@ const Home = () => {
               size="lg"
               className="bg-white text-black hover:bg-gray-200 transition-all duration-300"
             >
-              Get Started
+              <a href="/searchdemo">Get Started</a>
             </Button>
 
             <a
@@ -160,14 +152,12 @@ const Home = () => {
         </div>
       </div>
 
-      <ExploreBikes />
+      <ExploreBikesDemo />
 
       {/* Additional scrollable content */}
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
           <motion.div
-            data-scroll
-            data-scroll-speed="0.5"
             className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-8 border border-gray-700"
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
@@ -186,8 +176,6 @@ const Home = () => {
           </motion.div>
 
           <motion.div
-            data-scroll
-            data-scroll-speed="0.3"
             className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-8 border border-gray-700"
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
@@ -206,8 +194,6 @@ const Home = () => {
           </motion.div>
 
           <motion.div
-            data-scroll
-            data-scroll-speed="0.7"
             className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-8 border border-gray-700"
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
@@ -228,8 +214,6 @@ const Home = () => {
 
         {/* Stats Section */}
         <motion.div
-          data-scroll
-          data-scroll-speed="0.4"
           className="text-center mb-20"
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
@@ -266,8 +250,6 @@ const Home = () => {
 
         {/* Contact Section */}
         <motion.div
-          data-scroll
-          data-scroll-speed="0.6"
           className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-8 border border-gray-700 text-center"
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
@@ -289,7 +271,7 @@ const Home = () => {
             <Button
               size="lg"
               variant="outline"
-              className="border-gray-600 text-white hover:bg-gray-700 transition-all duration-300"
+              className="border-gray-600 text-black hover:bg-zinc-400 transition-all duration-300"
             >
               View Bikes
             </Button>

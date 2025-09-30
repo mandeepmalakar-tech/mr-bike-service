@@ -1,178 +1,137 @@
-import React, { useEffect, useState } from "react";
-import axiosInstance from "../api/axios.js";
-import { motion } from "framer-motion"; // eslint-disable-line no-unused-vars
+import React from "react";
+import { motion } from "framer-motion";
+import { StarIcon } from "lucide-react";
 
-const BikeCard = () => {
-  const [bikeData, setBikeData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+const BikeCard = ({ bike, searchParams, onBook, onViewDetails }) => {
+  const handleBookClick = () => {
+    if (onBook) {
+      onBook({
+        bike,
+        searchParams,
+      });
+    }
+  };
 
-  useEffect(() => {
-    const fetchBikeData = async () => {
-      try {
-        const res = await axiosInstance.get("/bikes");
-        // Handle different possible response structures
-        if (res.data.data && res.data.data.bikes) {
-          setBikeData(res.data.data.bikes);
-        } else if (res.data.data && Array.isArray(res.data.data)) {
-          setBikeData(res.data.data);
-        } else if (Array.isArray(res.data)) {
-          setBikeData(res.data);
-        } else {
-          setBikeData([]);
-        }
-      } catch (error) {
-        setError(error.response?.data?.message || "Failed to fetch bike data");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchBikeData();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center p-8">
-        <div className="text-lg">Loading bikes...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-        Error: {error}
-      </div>
-    );
-  }
-
-  if (!bikeData || bikeData.length === 0) {
-    return (
-      <div className="bg-gray-100 border border-gray-300 text-gray-700 px-4 py-3 rounded">
-        No bikes available at the moment.
-      </div>
-    );
-  }
+  const handleViewDetailsClick = () => {
+    if (onViewDetails) {
+      onViewDetails(bike);
+    }
+  };
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-8 text-center">Available Bikes</h1>
+    <motion.div
+      key={bike._id || bike.id || Math.random()}
+      className="bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-200 group"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      whileHover={{ y: -2 }}
+    >
+      {/* Header Section */}
+      <div className="p-4 border-b border-gray-100">
+        <div className="flex items-start justify-between mb-2">
+          <h3 className="text-lg font-bold text-gray-900">
+            {bike.name || "Unnamed Bike"}
+          </h3>
+          <div className="flex items-center gap-1 text-sm">
+            <StarIcon className="w-4 h-4 text-yellow-400 fill-current" />
+            <span className="font-medium">5.00</span>
+            <span className="text-gray-500">58 Trips</span>
+          </div>
+        </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {bikeData.map((bike) => (
-          <div
-            key={bike._id || bike.id || Math.random()}
-            className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 group"
-          >
-            {/* Image Section */}
-            <div className="relative h-48 bg-gradient-to-br from-gray-100 to-gray-200">
-              {bike.imageUrl ? (
-                <img
-                  src={bike.imageUrl}
-                  alt={bike.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <div className="w-16 h-16 bg-[#ea580c] rounded-full flex items-center justify-center">
-                    <svg
-                      className="w-8 h-8 text-white"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-                    </svg>
-                  </div>
-                </div>
-              )}
-              {/* Availability Badge */}
-              <div className="absolute top-3 right-3">
-                <span
-                  className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    (bike.numberOfVehicles || 0) > 0
-                      ? "bg-green-100 text-green-800"
-                      : "bg-red-100 text-red-800"
-                  }`}
-                >
-                  {(bike.numberOfVehicles || 0) > 0
-                    ? "Available"
-                    : "Unavailable"}
-                </span>
-              </div>
-            </div>
+        {/* Tags */}
+        <div className="flex flex-wrap gap-2 mb-3">
+          <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+            Pay at Pickup
+          </span>
+          <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+            {bike.category || "Street Bike"}
+          </span>
+          <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+            Hotseller
+          </span>
+        </div>
+      </div>
 
-            {/* Content Section */}
-            <div className="p-6">
-              <h3 className="text-xl font-bold text-gray-900 mb-2">
-                {bike.name || "Unnamed Bike"}
-              </h3>
-
-              <div className="space-y-2 mb-4">
-                <div className="flex items-center text-gray-600">
-                  <svg
-                    className="w-4 h-4 mr-2 text-[#ea580c]"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  <span className="text-sm">
-                    {bike.location || "Not specified"}
-                  </span>
-                </div>
-
-                <div className="flex items-center text-gray-600">
-                  <svg
-                    className="w-4 h-4 mr-2 text-[#ea580c]"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm2 2a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H7a1 1 0 01-1-1V6z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  <span className="text-sm">
-                    {bike.city || "Not specified"}
-                  </span>
-                </div>
-              </div>
-
-              {/* Price Section */}
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <span className="text-2xl font-bold text-[#ea580c]">
-                    ₹{bike.packageCost || "0"}
-                  </span>
-                  <span className="text-sm text-gray-500 ml-1">/day</span>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm text-gray-500">Available</p>
-                  <p className="text-lg font-semibold text-gray-900">
-                    {bike.numberOfVehicles || 0}
-                  </p>
-                </div>
-              </div>
-
-              {/* Book Now Button */}
-              <button
-                className="w-full bg-[#ea580c] hover:bg-[#dc2626] text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#ea580c] focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                disabled={(bike.numberOfVehicles || 0) === 0}
+      {/* Image Section */}
+      <div className="relative h-48 bg-gradient-to-br from-gray-100 to-gray-200">
+        {bike.imageUrl ? (
+          <img
+            src={bike.imageUrl}
+            alt={bike.name}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center">
+              <svg
+                className="w-8 h-8 text-white"
+                fill="currentColor"
+                viewBox="0 0 24 24"
               >
-                {(bike.numberOfVehicles || 0) > 0
-                  ? "Book Now"
-                  : "Not Available"}
-              </button>
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+              </svg>
             </div>
           </div>
-        ))}
+        )}
       </div>
-    </div>
+
+      {/* Content Section */}
+      <div className="p-4">
+        {/* Trip Details */}
+        <div className="space-y-2 mb-4 text-sm text-gray-600">
+          <div>Trip limit {bike.tripLimit || "3801km"}</div>
+          <div>Security Deposit Rs. {bike.securityDeposit || "3000"}</div>
+          <div>Location timings {bike.timings || "10am - 10pm"}</div>
+        </div>
+
+        {/* Price and Location */}
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <span className="text-2xl font-bold text-gray-900">
+              ₹{bike.packageCost || "0"}
+            </span>
+          </div>
+          <div className="flex items-center text-sm text-gray-600">
+            <div className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center mr-2">
+              <svg
+                className="w-3 h-3 text-gray-600"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </div>
+            <span>{bike.location || "INA Metro"}</span>
+            <span className="ml-1 text-gray-500">
+              ({bike.numberOfVehicles || 0} vehicles)
+            </span>
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-2">
+          <button
+            onClick={handleViewDetailsClick}
+            className="flex-1 text-blue-600 hover:text-blue-700 text-sm font-medium py-2 transition-colors duration-200"
+          >
+            View Packages
+          </button>
+          <button
+            onClick={handleBookClick}
+            className="flex-1 bg-gray-900 hover:bg-gray-800 text-white font-medium py-2 px-4 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={(bike.numberOfVehicles || 0) === 0}
+          >
+            Book Now
+          </button>
+        </div>
+      </div>
+    </motion.div>
   );
 };
 

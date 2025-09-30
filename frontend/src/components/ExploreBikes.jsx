@@ -74,7 +74,7 @@ const ExploreBikes = () => {
   };
 
   return (
-    <section className="relative bg-black">
+    <section className="relative bg-gray-800 py-16">
       {/* Background glow effect */}
       <div className="absolute inset-0">
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl"></div>
@@ -83,9 +83,7 @@ const ExploreBikes = () => {
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
-          data-scroll
-          data-scroll-speed="0.5"
-          className="text-center mb-16"
+          className="text-center "
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
@@ -101,8 +99,6 @@ const ExploreBikes = () => {
 
         {/* Search Form */}
         <motion.div
-          data-scroll
-          data-scroll-speed="0.3"
           className="bg-gray-800/30 backdrop-blur-sm rounded-2xl p-8 border border-gray-700 mb-16"
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}

@@ -28,67 +28,15 @@ body {
   position: relative;
 }
 
-/* Locomotive Scroll container */
-.locomotive-scroll-container {
+/* Native scrolling implementation following industry best practices */
+body {
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: auto;
   min-height: 100vh;
-  width: 100%;
 }
 
-.locomotive-scroll-container.scroll-loading {
-  opacity: 0;
-}
-
-.locomotive-scroll-container.scroll-ready {
-  opacity: 1;
-  transition: opacity 0.3s ease-in-out;
-}
-
-/* Locomotive Scroll styles */
-.has-scroll-smooth {
-  overflow: hidden;
-}
-
-.c-scrollbar {
-  width: 11px;
-  height: 100%;
-  top: 0;
-  right: 0;
-  transform-origin: center right;
-  transition: transform 0.3s, opacity 0.3s;
-  opacity: 0;
-  z-index: 1000;
-}
-
-.c-scrollbar:hover {
-  transform: scaleX(1.45);
-}
-
-.c-scrollbar.c-scrollbar_show {
-  opacity: 1;
-}
-
-.c-scrollbar_thumb {
-  position: absolute;
-  top: 0;
-  right: 0;
-  background-color: #f97316;
-  opacity: 0.7;
-  width: 7px;
-  border-radius: 10px;
-  margin: 2px;
-  cursor: -webkit-grab;
-  cursor: grab;
-  transition: opacity 0.3s ease;
-}
-
-.c-scrollbar_thumb:hover {
-  opacity: 1;
-}
-
-.c-scrollbar_thumb.c-scrollbar_thumb_active {
-  cursor: -webkit-grabbing;
-  cursor: grabbing;
-}
+/* Removed LocomotiveScroll-related styles */
 
 /* Custom scrollbar for webkit browsers */
 ::-webkit-scrollbar {
@@ -127,10 +75,6 @@ nav {
   z-index: 50;
 }
 
-.c-scrollbar {
-  z-index: 1000;
-}
-
 /* Smooth transitions */
 * {
   transition: color 0.2s ease, background-color 0.2s ease,
@@ -164,7 +108,6 @@ nav {
 /* Print styles */
 @media print {
   nav,
-  .c-scrollbar,
   footer {
     display: none !important;
   }
