@@ -128,7 +128,7 @@ const LoginForm = () => {
       const response = await axios.post("/users/login", { email, password });
       if (response.data.success) {
         setMessage("Login successful! Redirecting...");
-        navigate("/profile");
+        navigate("/search");
       } else {
         setMessage("Error: Please enter both email and password.");
       }

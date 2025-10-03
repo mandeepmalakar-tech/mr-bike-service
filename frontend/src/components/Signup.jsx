@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Mail, Lock, User, Chrome, Loader2, ArrowRight } from "lucide-react";
+import axios from "../api/axios";
 
 // --- UTILITY COMPONENT: CLASS NAME MERGER ---
 // A simple utility to conditionally join Tailwind classes.
@@ -113,24 +114,30 @@ const SignUpForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
 
-  // Simulated form submission (Front-end only)
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setMessage("");
-    setIsLoading(true);
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  setMessage("");
+  setIsLoading(true);
 
-    // --- PLACEHOLDER FOR BACKEND API CALL ---
-    // In a real application, replace this timeout with your fetch/axios call
-    setTimeout(() => {
-      setIsLoading(false);
-      if (name && email && password.length >= 6) {
-        setMessage("Success! Form data captured. Ready to connect to backend.");
-        // Optionally clear fields: setName(''); setEmail(''); setPassword('');
-      } else {
-        setMessage("Validation Error: Please check your input fields.");
-      }
-    }, 1500);
-  };
+  try {
+    console.log("User data being sent:", { name, email, password });
+    const res = await axios.post("/users/register", {
+      name,
+      email,
+      password,
+    });
+    setIsLoading(false);
+    setMessage(res.data.message); // Show success message
+    setName("");
+    setEmail("");
+    setPassword("");
+  } catch (err) {
+    setIsLoading(false);
+    setMessage(
+      err.response?.data?.message || "Something went wrong. Please try again."
+    );
+  }
+};
 
   // Simulated Google button click
   const handleGoogleClick = () => {
